@@ -315,7 +315,8 @@ if st.session_state.pagina_actual == 'Inicio':
     col1, espaciador, col2 = st.columns([1, 0.1, 1])
     
     with col1:
-        st.image("https://tse2.mm.bing.net/th/id/OIP.34oRqNm320iDcg2a4COHNwHaEK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", use_container_width=True, caption="Topología Continua")
+        # Reemplazar el nombre del .svg como corresponda
+        st.image("portada_prediccion.svg", use_container_width=True, caption="Topología Continua")
         st.markdown("<h3 style='text-align: center; color: #00D2FF;'>1. Predicción de Profundidad</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: MLP (Multi-Layer Perceptron)
         st.markdown("<p style='text-align: center;'>Estimación escalar mediante Perceptrón Multicapa (MLP - Multi-Layer Perceptron).</p>", unsafe_allow_html=True)
@@ -323,12 +324,14 @@ if st.session_state.pagina_actual == 'Inicio':
             pass
             
     with col2:
-        st.image("https://tse3.mm.bing.net/th/id/OIP.ettcMWiNT4PHdTboC-vnhwHaEK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3", use_container_width=True, caption="Fronteras de Decisión Discretas")
+        # Reemplazar el nombre del .svg como corresponda
+        st.image("portada_clasificacion.svg", use_container_width=True, caption="Fronteras de Decisión Discretas")
         st.markdown("<h3 style='text-align: center; color: #9D4EDD;'>2. Clasificación Operacional</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: GBM (Gradient Boosting Machine)
         st.markdown("<p style='text-align: center;'>Dictamen categórico mediante Ensamblaje Estocástico (GBM - Gradient Boosting Machine).</p>", unsafe_allow_html=True)
         if st.button("INGRESAR AL MÓDULO DE CLASIFICACIÓN", on_click=cambiar_pagina, args=('Clasificación',), use_container_width=True):
             pass
+
 
     # CONTEXTUALIZACIÓN DEL DATASET (Footer)
     st.markdown("<br><hr style='border: 1px solid #2A2E39;'>", unsafe_allow_html=True)
