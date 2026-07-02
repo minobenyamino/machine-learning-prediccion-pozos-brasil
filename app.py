@@ -316,7 +316,7 @@ if st.session_state.pagina_actual == 'Inicio':
     
     with col1:
         # Reemplazar el nombre del .svg como corresponda
-        st.image("portada_prediccion_petroleo_proo.svg", use_container_width=True, caption="Topología Continua")
+        st.image("portada_prediccion_petroleo_pro.svg", use_container_width=True, caption="Topología Continua")
         st.markdown("<h3 style='text-align: center; color: #00D2FF;'>1. Predicción de Profundidad</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: MLP (Multi-Layer Perceptron)
         st.markdown("<p style='text-align: center;'>Estimación escalar mediante Perceptrón Multicapa (MLP - Multi-Layer Perceptron).</p>", unsafe_allow_html=True)
@@ -325,7 +325,7 @@ if st.session_state.pagina_actual == 'Inicio':
             
     with col2:
         # Reemplazar el nombre del .svg como corresponda
-        st.image("portada_clasificacion_petroleo_brasil_v22.svg", use_container_width=True, caption="Fronteras de Decisión Discretas")
+        st.image("portada_clasificacion_petroleo_brasil_v2.svg", use_container_width=True, caption="Fronteras de Decisión Discretas")
         st.markdown("<h3 style='text-align: center; color: #9D4EDD;'>2. Clasificación Operacional</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: GBM (Gradient Boosting Machine)
         st.markdown("<p style='text-align: center;'>Dictamen categórico mediante Ensamblaje Estocástico (GBM - Gradient Boosting Machine).</p>", unsafe_allow_html=True)
