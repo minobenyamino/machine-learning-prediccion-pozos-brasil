@@ -15,18 +15,35 @@ from sklearn.inspection import permutation_importance
 # 1. CONFIGURACIÓN DE PÁGINA Y ESTADOS DE SESIÓN
 # ==========================================
 st.set_page_config(
-    page_title="Sistema Bi-Modular IA",
+    page_title="Modelos Estadísticos de Predicción",
     page_icon="🛢️",
     layout="wide", 
     initial_sidebar_state="expanded"
 )
 
-# Inicialización del enrutador de páginas
+# Inicialización del enrutador de páginas y variables de sesión
 if 'pagina_actual' not in st.session_state:
     st.session_state.pagina_actual = 'Inicio'
 
+if 'aviso_leido' not in st.session_state:
+    st.session_state.aviso_leido = False
+
 def cambiar_pagina(nueva_pagina):
     st.session_state.pagina_actual = nueva_pagina
+
+# --- PANTALLA EMERGENTE (POP-UP) ---
+@st.dialog("⚠️ Aviso Académico")
+def mostrar_disclaimer():
+    st.markdown("Este sistema predictivo tiene **fines de evaluación estudiantil**.")
+    st.markdown("Los dictámenes arrojados poseen un margen de error estadístico. **Bajo ninguna circunstancia** este software debe utilizarse como referencia absoluta, ni sustituir el criterio geofísico humano en proyectos reales de perforación.")
+    
+    if st.button("Comprendido y Aceptado", type="primary", use_container_width=True):
+        st.session_state.aviso_leido = True
+        st.rerun()
+
+# Disparador automático de la pantalla emergente
+if not st.session_state.aviso_leido:
+    mostrar_disclaimer()
 
 # --- CSS Global ---
 st.markdown("""
@@ -290,9 +307,9 @@ if st.session_state.pagina_actual != 'Inicio':
 
 # VISTA 1: INICIO (PORTADA)
 if st.session_state.pagina_actual == 'Inicio':
-    st.markdown("<div class='portada-title'>Sistema Integral Bi-Modular de IA</div>", unsafe_allow_html=True)
-    st.markdown("<div class='portada-subtitle'>Análisis Estocástico Multivariante del Subsuelo</div>", unsafe_allow_html=True)
-    st.markdown("<div class='portada-academic'>Universidad Central del Ecuador (UCE) | FIGEMPA - Ingeniería en Estadística</div>", unsafe_allow_html=True)
+    st.markdown("<div class='portada-title'>Modelos de Machine Learning asistidos por IA</div>", unsafe_allow_html=True)
+    st.markdown("<div class='portada-subtitle'>Análisis Estocástico Multivariante del Subsuelo Brasileño</div>", unsafe_allow_html=True)
+    st.markdown("<div class='portada-academic'>Universidad Central del Ecuador (UCE) | FIGEMPA - Ingeniería en Petróleos</div>", unsafe_allow_html=True)
     st.markdown("<br><br>", unsafe_allow_html=True)
     
     col1, espaciador, col2 = st.columns([1, 0.1, 1])
@@ -315,7 +332,7 @@ if st.session_state.pagina_actual == 'Inicio':
 
     # CONTEXTUALIZACIÓN DEL DATASET (Footer)
     st.markdown("<br><hr style='border: 1px solid #2A2E39;'>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #8C92A4; font-size: 0.9rem;'><b>Material de Estudio Riguroso:</b> Las arquitecturas matemáticas de este proyecto fueron entrenadas utilizando los registros públicos oficiales de la <b>Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)</b> de la República Federativa del Brasil.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #8C92A4; font-size: 0.9rem;'><b>Material de Estudio:</b> Las arquitecturas matemáticas de este proyecto fueron entrenadas utilizando los registros públicos oficiales de kagle de la <b>Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)</b> de la República Federativa de Brasil.</p>", unsafe_allow_html=True)
 
 # VISTA 2: MÓDULO DE PREDICCIÓN (MLP)
 elif st.session_state.pagina_actual == 'Predicción':
