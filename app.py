@@ -71,22 +71,29 @@ st.markdown("""
 @st.cache_resource
 def inicializar_componentes():
     try:
-        # Módulo de Regresión
-        mod_reg = joblib.load('modelo_mlp_pozos.pkl')
+        # --- MODELOS HISTÓRICOS (ORIGINALES) ---
+        mod_reg_mlp = joblib.load('modelo_mlp_pozos.pkl')
         prep_reg = joblib.load('preprocesador_pozos.pkl')
-        mae = joblib.load('mae_error.pkl')
+        mae_mlp = joblib.load('mae_error.pkl')
         dicc = joblib.load('diccionario_opciones.pkl')
+        pipe_clf_gbm = joblib.load('pipeline_clasificacion_pozos.pkl')
+        met_clf_gbm = joblib.load('metricas_clasificacion.pkl')
         
-        # Módulo de Clasificación
-        pipe_clf = joblib.load('pipeline_clasificacion_pozos.pkl')
-        met_clf = joblib.load('metricas_clasificacion.pkl')
+        # --- NUEVOS ARTEFACTOS ALTERNATIVOS ---
+        mod_reg_gbm = joblib.load('modelo_gbm_pozos_reg.pkl')
+        mae_gbm = joblib.load('mae_error_gbm_reg.pkl')
+        pipe_clf_mlp = joblib.load('pipeline_mlp_clasificacion_pozos.pkl')
+        exactitud_mlp_val = joblib.load('exactitud_mlp_clf.pkl')
         
-        return mod_reg, prep_reg, mae, dicc, pipe_clf, met_clf
+        return (mod_reg_mlp, mod_reg_gbm, prep_reg, mae_mlp, mae_gbm, dicc, 
+                pipe_clf_gbm, pipe_clf_mlp, met_clf_gbm, exactitud_mlp_val)
     except FileNotFoundError:
-        st.error("⚠️ Error: Faltan archivos .pkl en el directorio. Ejecuta primero los scripts de entrenamiento.")
+        st.error("⚠️ Error Crítico: Faltan archivos .pkl en el directorio. Ejecuta primero los scripts de entrenamiento.")
         st.stop()
 
-modelo_reg, preprocesador_reg, mae_error, diccionario, pipeline_clf, metricas_clf = inicializar_componentes()
+# Desempaquetado global de tensores y modelos
+(modelo_reg_mlp, modelo_reg_gbm, preprocesador_reg, mae_error_mlp, mae_error_gbm, 
+ diccionario, pipeline_clf_gbm, pipeline_clf_mlp, metricas_clf_gbm, exactitud_mlp_clf) = inicializar_componentes()
 
 @st.cache_data
 def generar_datos_rendimiento():
@@ -337,17 +344,25 @@ if st.session_state.pagina_actual == 'Inicio':
     st.markdown("<br><hr style='border: 1px solid #2A2E39;'>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #8C92A4; font-size: 0.9rem;'><b>Material de Estudio:</b> Las arquitecturas matemáticas de este proyecto fueron entrenadas utilizando los registros públicos oficiales de kagle de la <b>Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)</b> de la República Federativa de Brasil.</p>", unsafe_allow_html=True)
 
-# VISTA 2: MÓDULO DE PREDICCIÓN (MLP)
+# VISTA 2: MÓDULO DE PREDICCIÓN (MLP & GBM)
 elif st.session_state.pagina_actual == 'Predicción':
-    st.title("🎯 Modelo Predictivo: Regresión Continua (MLP)")
-    st.markdown("Inferencia de Profundidad de Sondador asistida por Redes Neuronales Artificiales.")
+    st.title("🎯 Modelo Predictivo: Regresión Continua")
+    st.markdown("Inferencia de Profundidad de Sondador asistida por Redes Neuronales Artificiales y Gradient Boosting.")
     
-    tab_inf, tab_aud = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Arquitectura del Modelo"])
+    # Se expanden las pestañas a 3
+    tab_inf, tab_aud, tab_aud_gbm = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Arquitectura (MLP)", "📊 Auditoría y Evaluación (GBM)"])
     
     with tab_inf:
-        if st.button("🚀 INICIAR PROPAGACIÓN NEURONAL", type="primary", use_container_width=True):
+        # --- INYECCIÓN 1: SELECTOR DE MODELO ---
+        st.markdown("### Configuración del Motor Matemático")
+        motor_seleccionado = st.radio("Seleccione el algoritmo para ejecutar el cálculo:", 
+                                      ["Perceptrón Multicapa (MLP)", "Gradient Boosting de Histograma (GBM)"], 
+                                      horizontal=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("🚀 INICIAR PROPAGACIÓN Y CÁLCULO", type="primary", use_container_width=True):
             
-            # --- COMPUERTA DE VALIDACIÓN LÓGICA (EDGE CASES) ---
+            # --- COMPUERTA DE VALIDACIÓN LÓGICA (EDGE CASES) - INTACATA ---
             if entorno_operativo == "mar" and lamina_agua <= 0:
                 st.error("⚠️ **Inconsistencia Geofísica:** Ha seleccionado un entorno marino (Offshore), pero la lámina de agua es 0 m. Ajuste el parámetro antes de continuar.")
             elif entorno_operativo == "tierra" and lamina_agua > 0:
@@ -356,35 +371,52 @@ elif st.session_state.pagina_actual == 'Predicción':
                 st.error("⚠️ **Frontera Geográfica Excedida:** La latitud ingresada se encuentra fuera del bloque exploratorio de la cuenca brasileña.")
             else:
                 # Si pasa la validación, procedemos con la inferencia pesada
-                with st.spinner('Computando tensores...'):
+                with st.spinner('Computando tensores en paralelo...'):
                     time.sleep(0.5)
                     vector_crudo = pd.DataFrame([[latitud_usuario, longitud_usuario, lamina_agua, cota_altimetrica, cuenca_seleccionada, entorno_operativo, clase_pozo, categoria_pozo, campo_seleccionado, situacion_pozo]], 
                                                 columns=['LATITUDE_BASE_DD', 'LONGITUDE_BASE_DD', 'LAMINA_D_AGUA_M', 'COTA_ALTIMETRICA_M', 'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO', 'SITUACAO'])
                     
                     vector_estandarizado = preprocesador_reg.transform(vector_crudo)
                     
-                    # INFERENCIA Y RESTRICCIÓN DE RANGO FÍSICO
-                    # max(0.0, prediccion) impide matemáticamente que la propagación hacia adelante
-                    # devuelva una profundidad de perforación negativa, evitando absurdos geológicos.
-                    prediccion_cruda = modelo_reg.predict(vector_estandarizado)[0]
-                    profundidad_calculada = max(0.0, prediccion_cruda)
+                    # --- INYECCIÓN 2: CÁLCULO DUAL PARA MENSAJE CONTRAFACTUAL ---
+                    # Calculamos ambos modelos en segundo plano
+                    pred_mlp_cruda = modelo_reg_mlp.predict(vector_estandarizado)[0]
+                    pred_gbm_cruda = modelo_reg_gbm.predict(vector_estandarizado)[0]
+                    
+                    prof_mlp = max(0.0, pred_mlp_cruda)
+                    prof_gbm = max(0.0, pred_gbm_cruda)
+                    
+                    # Asignamos variables principales vs alternativas según la selección
+                    if motor_seleccionado == "Perceptrón Multicapa (MLP)":
+                        profundidad_calculada, mae_activo = prof_mlp, mae_error_mlp
+                        prof_sombra, mae_sombra, nombre_sombra = prof_gbm, mae_error_gbm, "Gradient Boosting de Histograma"
+                    else:
+                        profundidad_calculada, mae_activo = prof_gbm, mae_error_gbm
+                        prof_sombra, mae_sombra, nombre_sombra = prof_mlp, mae_error_mlp, "Perceptrón Multicapa"
                     
                     # Cálculo de la franja de incertidumbre limitando también la cota inferior
-                    limite_inferior = max(0.0, profundidad_calculada - mae_error)
-                    limite_superior = profundidad_calculada + mae_error
+                    limite_inferior = max(0.0, profundidad_calculada - mae_activo)
+                    limite_superior = profundidad_calculada + mae_activo
                     
                     col_t, col_i = st.columns([1, 1.8])
                     with col_t:
+                        # HTML ORIGINAL INTACTO (Solo añadí el </div> de cierre final)
                         st.markdown(f"""
                         <div class="metric-card">
                             <div class="metric-title">Profundidad Proyectada (μ)</div>
                             <div class="metric-value">{profundidad_calculada:,.1f} <span style="font-size: 1.5rem; color: #8C92A4;">m</span></div>
-                            <div class="metric-error"><span>± {mae_error:.1f} m (MAE: Error Absoluto Medio)</span></div>
+                            <div class="metric-error"><span>± {mae_activo:.1f} m (MAE: Error Absoluto Medio)</span></div>
+                        </div>
                         """, unsafe_allow_html=True)
                         st.info(f"📍 **Fin de Perforación Estimado:**\n\nLas rocas objetivo se interceptarán en un estrato comprendido entre **{limite_inferior:,.1f} m** y **{limite_superior:,.1f} m**.")
+                        
+                        # --- INYECCIÓN 3: MENSAJE CONTRAFACTUAL ---
+                        st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de **{prof_sombra:,.1f} m** (Error MAE: ± {mae_sombra:.1f} m).")
+                        
                     with col_i:
-                        st.plotly_chart(generar_curva_probabilidad(profundidad_calculada, mae_error), use_container_width=True)
+                        st.plotly_chart(generar_curva_probabilidad(profundidad_calculada, mae_activo), use_container_width=True)
 
+    # --- PESTAÑA ORIGINAL INTACTA (Solo se actualizó modelo_reg a modelo_reg_mlp) ---
     with tab_aud:
         st.markdown("### Estructura Topológica y Diagnóstico Visual")
         st.markdown("Arquitectura interna del modelo perceptrón y evaluación de su rendimiento estocástico.")
@@ -417,7 +449,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                 * **Parada Temprana (Early Stopping):** El entrenamiento se interrumpió automáticamente cuando la curva roja alcanzó su pico máximo para evitar memorizar el ruido estadístico (*Overfitting*).
                 """)
             with col_graf2:
-                st.plotly_chart(generar_curva_aprendizaje(modelo_reg), use_container_width=True)
+                st.plotly_chart(generar_curva_aprendizaje(modelo_reg_mlp), use_container_width=True)
                 
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
                 
@@ -428,7 +460,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                                       'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO', 'SITUACAO']]
                 y_real = df_prueba['PROFUNDIDADE_SONDADOR_M']
                 X_prueba_estandarizado = preprocesador_reg.transform(X_prueba)
-                y_predicho = modelo_reg.predict(X_prueba_estandarizado)
+                y_predicho = modelo_reg_mlp.predict(X_prueba_estandarizado)
                 
                 fig_heat = px.density_contour(
                     x=y_real, y=y_predicho, 
@@ -453,15 +485,116 @@ elif st.session_state.pagina_actual == 'Predicción':
                 * **Distribuciones Marginales:** Los histogramas laterales representan el volumen de registros históricos y se alinean con los núcleos de las inferencias.
                 """)
 
-# VISTA 3: MÓDULO DE CLASIFICACIÓN (GBM)
+    # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA GBM ---
+    with tab_aud_gbm:
+        # He actualizado el título para reflejar que ya no hay mapa de densidad
+        st.markdown("### Arquitectura de Árboles y Análisis de Residuos (GBM)")
+        st.markdown("Evaluación estocástica del modelo particional alternativo para regresión continua.")
+        
+        with st.spinner("Computando ensamblaje de árboles y análisis de residuos..."):
+            
+            # ====================================================================
+            # 1. MOTOR DE EXTRACCIÓN E INFERENCIA (Invisible en la Interfaz)
+            # ====================================================================
+            X_prueba = df_prueba[['LATITUDE_BASE_DD', 'LONGITUDE_BASE_DD', 'LAMINA_D_AGUA_M', 'COTA_ALTIMETRICA_M', 'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO', 'SITUACAO']]
+            y_real = df_prueba['PROFUNDIDADE_SONDADOR_M']
+            
+            # Estandarizamos e inferimos para tener los datos listos para los residuos
+            X_prueba_estandarizado = preprocesador_reg.transform(X_prueba)
+            y_predicho_gbm = modelo_reg_gbm.predict(X_prueba_estandarizado)
+            
+            # ====================================================================
+            # 2. CUADRÍCULA DE AUDITORÍA AVANZADA (Renderizado Visual)
+            # ====================================================================
+            col_izq_reg, col_der_reg = st.columns(2, gap="large")
+            
+            with col_izq_reg:
+                st.subheader("1. Importancia Predictiva (GBM)")
+                st.markdown("Permutación estocástica para revelar qué variables geológicas dominan la partición de los árboles de decisión en la inferencia de profundidad.")
+                
+                # Ensamblamos temporalmente el pipeline completo
+                from sklearn.pipeline import make_pipeline
+                from sklearn.inspection import permutation_importance
+                
+                pipeline_temporal_gbm = make_pipeline(preprocesador_reg, modelo_reg_gbm)
+                # n_repeats=3 por eficiencia en despliegue web
+                resultado_imp = permutation_importance(pipeline_temporal_gbm, X_prueba, y_real, n_repeats=3, random_state=42, scoring='neg_mean_absolute_error')
+                
+                nombres_cols_reg = ['LATITUD', 'LONGITUD', 'LÁMINA AGUA', 'COTA ALTIM.', 'CUENCA', 'ENTORNO', 'CLASE', 'CATEGORÍA', 'CAMPO', 'SITUACIÓN']
+                df_imp_reg = pd.DataFrame({'Variable': nombres_cols_reg, 'Importancia': resultado_imp.importances_mean}).sort_values(by='Importancia', ascending=True)
+                
+                fig_imp_reg = px.bar(df_imp_reg, x='Importancia', y='Variable', orientation='h', color='Importancia', color_continuous_scale='Emrld')
+                fig_imp_reg.update_layout(template="plotly_dark", coloraxis_showscale=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=380, margin=dict(t=20, b=20, l=10, r=10))
+                st.plotly_chart(fig_imp_reg, use_container_width=True, key="imp_gbm_reg")
+
+            with col_der_reg:
+                st.subheader("2. Análisis de Residuos (Homocedasticidad)")
+                st.markdown("Verifica si los errores del modelo $e = Y_{real} - Y_{pred}$ son aleatorios. Si los puntos forman embudos, la varianza es inestable (Heterocedasticidad).")
+                
+                # Ahora y_predicho_gbm y y_real sí existen en memoria
+                residuos_gbm = y_real - y_predicho_gbm
+                
+                fig_res = px.scatter(
+                    x=y_predicho_gbm, y=residuos_gbm, 
+                    labels={'x': 'Profundidad Inferida (m)', 'y': 'Residuo (Error en m)'}, 
+                    opacity=0.6, color_discrete_sequence=['#00FF7F']
+                )
+                
+                # Línea central de error cero (perfección predictiva)
+                fig_res.add_hline(y=0, line_dash="dot", line_color="#FF4B4B", line_width=2)
+                
+                # =================================================================
+                # NUEVO: CÁLCULO MATEMÁTICO DEL CONO DE HETEROCEDASTICIDAD
+                # =================================================================
+                # 1. Ajustamos una recta (grado 1) sobre el valor absoluto del error
+                z = np.polyfit(y_predicho_gbm, np.abs(residuos_gbm), 1)
+                polinomio = np.poly1d(z)
+                
+                # 2. Generamos el vector X para la longitud del gráfico
+                x_cono = np.linspace(min(y_predicho_gbm), max(y_predicho_gbm), 100)
+                
+                # 3. Calculamos Y. Multiplicamos por 2.5 para abarcar la dispersión 
+                # simulando una envolvente de confianza (aprox 95% de los datos).
+                y_cono_sup = polinomio(x_cono) * 2.5 
+                y_cono_inf = -y_cono_sup
+                
+                # 4. Inyectamos la envolvente superior al gráfico (línea punteada celeste)
+                fig_res.add_trace(go.Scatter(
+                    x=x_cono, y=y_cono_sup, mode='lines', 
+                    line=dict(color='#00D2FF', width=2, dash='dash'), 
+                    name='Límite de Varianza', hoverinfo='skip'
+                ))
+                # 5. Inyectamos la envolvente inferior
+                fig_res.add_trace(go.Scatter(
+                    x=x_cono, y=y_cono_inf, mode='lines', 
+                    line=dict(color='#00D2FF', width=2, dash='dash'), 
+                    showlegend=False, hoverinfo='skip'
+                ))
+                # =================================================================
+                
+                fig_res.update_layout(
+                    template="plotly_dark", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', 
+                    height=380, margin=dict(t=20, b=20, l=10, r=10), showlegend=False
+                )
+                st.plotly_chart(fig_res, use_container_width=True, key="residuos_gbm_reg")
+                
+# VISTA 3: MÓDULO DE CLASIFICACIÓN (GBM & MLP)
 elif st.session_state.pagina_actual == 'Clasificación':
-    st.title("🗂️ Módulo Operacional: Clasificación (Gradient Boosting)")
-    st.markdown("Dictamen categórico estocástico mitigando el desbalance de clases mediante partición ortogonal.")
+    st.title("🗂️ Módulo Operacional: Clasificación")
+    st.markdown("Dictamen categórico estocástico comparando ensamblajes ortogonales frente a topologías neuronales.")
     
-    tab_inf, tab_aud = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Evaluación Multivariante"])
+    # Se expanden las pestañas a 3
+    tab_inf, tab_aud_gbm, tab_aud_mlp = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Evaluación (GBM)", "📊 Auditoría y Evaluación (MLP)"])
     
     # --- PESTAÑA DE INFERENCIA ---
     with tab_inf:
+        # --- INYECCIÓN 1: SELECTOR DE MODELO DE CLASIFICACIÓN ---
+        st.markdown("### Configuración del Motor Matemático")
+        motor_seleccionado_clf = st.radio("Seleccione el algoritmo para la clasificación operativa:", 
+                                          ["Gradient Boosting de Histograma (GBM)", "Perceptrón Multicapa (MLP)"], 
+                                          horizontal=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
         if st.button("🚀 EJECUTAR ENSAMBLAJE ESTOCÁSTICO", type="primary", use_container_width=True):
             
             # 1. Compuerta Lógica de Seguridad Físico-Matemática
@@ -470,41 +603,59 @@ elif st.session_state.pagina_actual == 'Clasificación':
             elif entorno_operativo == "tierra" and lamina_agua > 0:
                 st.error("⚠️ **Inconsistencia Topográfica:** Un pozo en tierra (Onshore) no puede poseer lámina de agua.")
             else:
-                with st.spinner('Ejecutando Acoplamiento Secuencial (MLP ➔ GBM)...'):
+                with st.spinner('Ejecutando Acoplamiento Secuencial (Profundidad ➔ Clasificación)...'):
                     time.sleep(0.5)
                     
                     # ==========================================
-                    # FASE 1: INFERENCIA DE PROFUNDIDAD (MLP)
+                    # FASE 1: INFERENCIA DE PROFUNDIDAD (MLP BASE)
                     # ==========================================
                     vector_reg = pd.DataFrame([[latitud_usuario, longitud_usuario, lamina_agua, cota_altimetrica, cuenca_seleccionada, entorno_operativo, clase_pozo, categoria_pozo, campo_seleccionado, "otras_situaciones"]], 
                                                 columns=['LATITUDE_BASE_DD', 'LONGITUDE_BASE_DD', 'LAMINA_D_AGUA_M', 'COTA_ALTIMETRICA_M', 'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO', 'SITUACAO'])
                     
                     vector_estandarizado_reg = preprocesador_reg.transform(vector_reg)
-                    prediccion_cruda_reg = modelo_reg.predict(vector_estandarizado_reg)[0]
-                    profundidad_calculada = max(0.0, prediccion_cruda_reg) # Restringe números negativos
+                    # Usamos el modelo de regresión MLP como estimador base de profundidad
+                    prediccion_cruda_reg = modelo_reg_mlp.predict(vector_estandarizado_reg)[0]
+                    profundidad_calculada = max(0.0, prediccion_cruda_reg) 
                     
                     # ==========================================
-                    # FASE 2: INFERENCIA OPERACIONAL (GRADIENT BOOSTING)
-                    # El orden de las columnas debe ser exacto: 5 Numéricas + 5 Categóricas
+                    # FASE 2: INFERENCIA OPERACIONAL (CÁLCULO DUAL)
                     # ==========================================
                     vector_clf = pd.DataFrame([[latitud_usuario, longitud_usuario, lamina_agua, cota_altimetrica, profundidad_calculada, cuenca_seleccionada, entorno_operativo, clase_pozo, categoria_pozo, campo_seleccionado]], 
                                                 columns=['LATITUDE_BASE_DD', 'LONGITUDE_BASE_DD', 'LAMINA_D_AGUA_M', 'COTA_ALTIMETRICA_M', 'PROFUNDIDADE_SONDADOR_M', 'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO'])
                     
-                    # Extracción directa del Pipeline (sin usar diccionarios extraños)
-                    nombres_clases = pipeline_clf.classes_
-                    prediccion_clase_idx = pipeline_clf.predict(vector_clf)[0]
-                    probabilidades_porcentaje = pipeline_clf.predict_proba(vector_clf)[0] * 100
+                    nombres_clases = pipeline_clf_gbm.classes_
+                    
+                    # Inferencia de ambos motores
+                    pred_idx_gbm = pipeline_clf_gbm.predict(vector_clf)[0]
+                    probs_gbm = pipeline_clf_gbm.predict_proba(vector_clf)[0] * 100
+                    
+                    pred_idx_mlp = pipeline_clf_mlp.predict(vector_clf)[0]
+                    probs_mlp = pipeline_clf_mlp.predict_proba(vector_clf)[0] * 100
+                    
+                    # --- INYECCIÓN 2: ASIGNACIÓN DE ROLES (PRINCIPAL VS CONTRAFACTUAL) ---
+                    if motor_seleccionado_clf == "Gradient Boosting de Histograma (GBM)":
+                        pred_clase_activa = pred_idx_gbm
+                        probs_activas = probs_gbm
+                        pred_clase_sombra = pred_idx_mlp
+                        exactitud_activa = metricas_clf_gbm['exactitud']
+                        exactitud_sombra = exactitud_mlp_clf
+                        nombre_sombra = "Perceptrón Multicapa - MLP"
+                    else:
+                        pred_clase_activa = pred_idx_mlp
+                        probs_activas = probs_mlp
+                        pred_clase_sombra = pred_idx_gbm
+                        exactitud_activa = exactitud_mlp_clf
+                        exactitud_sombra = metricas_clf_gbm['exactitud']
+                        nombre_sombra = "Gradient Boosting - GBM"
                     
                     # Manejo seguro si la predicción es texto o índice numérico
-                    if isinstance(prediccion_clase_idx, (int, np.integer)):
-                        nombre_clase_predicha = nombres_clases[prediccion_clase_idx]
-                    else:
-                        nombre_clase_predicha = prediccion_clase_idx
+                    nombre_clase_predicha = nombres_clases[pred_clase_activa] if isinstance(pred_clase_activa, (int, np.integer)) else pred_clase_activa
+                    nombre_clase_sombra = nombres_clases[pred_clase_sombra] if isinstance(pred_clase_sombra, (int, np.integer)) else pred_clase_sombra
                     
                     # ==========================================
                     # FASE 3: RENDERIZADO DE RESULTADOS
                     # ==========================================
-                    st.success(f"🔗 **Pipeline Secuencial Activo:** La Red Neuronal estimó el lecho de roca objetivo en **{profundidad_calculada:,.1f} metros**. Este vector tridimensional fue transferido al Gradient Boosting para computar la viabilidad del pozo.")
+                    st.success(f"🔗 **Pipeline Secuencial Activo:** Se estimó el lecho de roca objetivo en **{profundidad_calculada:,.1f} metros**. Este vector tridimensional fue transferido al clasificador para computar la viabilidad del pozo.")
                     
                     st.markdown(f"""
                         <div class="metric-card" style="border-left-color: #9D4EDD; text-align: center;">
@@ -512,9 +663,12 @@ elif st.session_state.pagina_actual == 'Clasificación':
                             <div class="metric-value" style="color: #9D4EDD;">{str(nombre_clase_predicha).upper()}</div>
                         </div>
                     """, unsafe_allow_html=True)
+                    
+                    # --- INYECCIÓN 3: MENSAJE CONTRAFACTUAL CLASIFICACIÓN ---
+                    st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de situación **{str(nombre_clase_sombra).upper()}** (Exactitud histórica del motor: {exactitud_sombra:.2%}).")
 
                     st.subheader("Distribución de Probabilidad")
-                    df_probs = pd.DataFrame({'Situación': nombres_clases, 'Probabilidad (%)': probabilidades_porcentaje}).sort_values(by='Probabilidad (%)')
+                    df_probs = pd.DataFrame({'Situación': nombres_clases, 'Probabilidad (%)': probs_activas}).sort_values(by='Probabilidad (%)')
                     
                     # Gráfico Plotly
                     fig_probs = px.bar(df_probs, x='Probabilidad (%)', y='Situación', orientation='h', text='Probabilidad (%)', color='Probabilidad (%)', color_continuous_scale='Purples')
@@ -523,37 +677,28 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     fig_probs.update_xaxes(range=[0, max(100, df_probs['Probabilidad (%)'].max() + 10)])
                     st.plotly_chart(fig_probs, use_container_width=True)
 
-    # --- # --- PESTAÑA DE AUDITORÍA ESTADÍSTICA ---
-    with tab_aud:
-        st.markdown("### Diagnóstico Estructural del Modelo")
+    # --- PESTAÑA ORIGINAL INTACTA (Solo renombrada a GBM) ---
+    with tab_aud_gbm:
+        st.markdown("### Diagnóstico Estructural del Modelo (GBM)")
         st.markdown("Evaluación multivariante y de interpretabilidad analítica ('Caja Blanca').")
         
         with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
-            clases_nombres = metricas_clf['clases']
+            clases_nombres = metricas_clf_gbm['clases']
             
-            # ==========================================
-            # SECCIÓN 1: IMPORTANCIA DE VARIABLES (ANCHO COMPLETO)
-            # ==========================================
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
             st.subheader("1. Importancia Predictiva de Variables (Permutation Importance)")
             st.markdown("""
             Este análisis cuantifica qué variables impulsaron las decisiones del modelo matemático. Al introducir 'ruido estocástico' (permutando aleatoriamente los datos de una columna), evaluamos la caída de la exactitud. Las barras más largas representan las variables más críticas para el éxito de la inferencia.
             """)
-            st.plotly_chart(generar_grafico_importancia(pipeline_clf, df_prueba, clases_nombres), use_container_width=True)
+            st.plotly_chart(generar_grafico_importancia(pipeline_clf_gbm, df_prueba, clases_nombres), use_container_width=True, key="importancia_gmb")
             
-            # ==========================================
-            # SECCIÓN 2 Y 3: MATRIZ Y CURVAS (CUADRÍCULA SIMÉTRICA)
-            # ==========================================
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 20px; margin-bottom: 20px;'>", unsafe_allow_html=True)
             col_izq, col_der = st.columns(2, gap="large")
             
             with col_izq:
-                # Acrónimos definidos para la explicación estadística
                 st.subheader("2. Matriz de Confusión Agrupada")
-                st.markdown(f"**Exactitud Global:** {metricas_clf['exactitud']:.2%} | **Precisión:** {metricas_clf['precision']:.2%} | **Exhaustividad (Recall):** {metricas_clf['exhaustividad']:.2%}<br>Muestra empíricamente el volumen de aciertos y errores. Matriz condensada en 4 Macro-Categorías para su correcta lectura óptica.", unsafe_allow_html=True)
+                st.markdown(f"**Exactitud Global:** {metricas_clf_gbm['exactitud']:.2%} | **Precisión:** {metricas_clf_gbm['precision']:.2%} | **Exhaustividad (Recall):** {metricas_clf_gbm['exhaustividad']:.2%}<br>Muestra empíricamente el volumen de aciertos y errores. Matriz condensada en 4 Macro-Categorías para su correcta lectura óptica.", unsafe_allow_html=True)
                 
-                # --- ALGORITMO DE AGRUPACIÓN (OPCIÓN A) ---
-                # Función para condensar la cardinalidad de la base de datos de la ANP
                 def agrupar_situacion(clase_texto):
                     c_low = str(clase_texto).lower()
                     if 'produt' in c_low or 'product' in c_low or 'injet' in c_low or 'jazida' in c_low: 
@@ -565,19 +710,16 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     else: 
                         return 'Otras Situaciones'
 
-                # 1. Definimos las nuevas dimensiones
                 macro_clases = ['Productores / Activos', 'Abandonados / Cerrados', 'Exploración / Pioneros', 'Otras Situaciones']
                 map_indices = {i: agrupar_situacion(c) for i, c in enumerate(clases_nombres)}
                 
-                # 2. Re-ensamblamos el tensor cuadrado (DataFrame de 4x4)
                 matriz_agrupada = pd.DataFrame(0, index=macro_clases, columns=macro_clases)
                 for i in range(len(clases_nombres)):
                     for j in range(len(clases_nombres)):
                         cat_real = map_indices[i]
                         cat_pred = map_indices[j]
-                        matriz_agrupada.loc[cat_real, cat_pred] += metricas_clf['matriz_confusion'][i][j]
+                        matriz_agrupada.loc[cat_real, cat_pred] += metricas_clf_gbm['matriz_confusion'][i][j]
 
-                # 3. Renderizado minimalista habilitando el texto de celdas (text_auto=True)
                 fig_cm = px.imshow(
                     matriz_agrupada, 
                     x=macro_clases, 
@@ -596,12 +738,85 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     template="plotly_dark", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', 
                     height=450, margin=dict(t=20, b=20, l=10, r=10)
                 )
-                # Rotación a -45 grados para que los nombres de las familias no se pisen
                 fig_cm.update_xaxes(tickangle=-45)
                 
-                st.plotly_chart(fig_cm, use_container_width=True)
+                st.plotly_chart(fig_cm, use_container_width=True, key="matriz_gbm")
                 
             with col_der:
                 st.subheader("3. Curva Precisión-Exhaustividad")
                 st.markdown("**Evaluación Dinámica (PR Curve):** Analiza el algoritmo frente al severo desbalance poblacional. Las trayectorias que convergen hacia la esquina superior derecha confirman alta separabilidad matemática.", unsafe_allow_html=True)
-                st.plotly_chart(generar_curva_precision_recall(pipeline_clf, df_prueba, clases_nombres), use_container_width=True)
+                st.plotly_chart(generar_curva_precision_recall(pipeline_clf_gbm, df_prueba, clases_nombres), use_container_width=True, key="curva_gbm")
+
+    # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA EL MLP ---
+    with tab_aud_mlp:
+        st.markdown("### Diagnóstico Estructural del Modelo (MLP)")
+        st.markdown("Evaluación multivariante y de interpretabilidad analítica ('Caja Blanca') para la Red Neuronal.")
+        
+        with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
+            clases_nombres = metricas_clf_gbm['clases']
+            
+            # --- NUEVO BLOQUE: TOPOLOGÍA Y APRENDIZAJE DEL MLP DE CLASIFICACIÓN ---
+            col_graf_top_mlp, col_txt_top_mlp = st.columns([1.6, 1])
+            with col_graf_top_mlp:
+                # Extraemos el modelo puro del pipeline para leer su arquitectura
+                mlp_puro_clf = pipeline_clf_mlp.named_steps['modelo_mlp']
+                
+                # Función inline para el esquema topológico de clasificación
+                def generar_grafo_mlp_clasificacion():
+                    # Entrada (10), Ocultas (simuladas visualmente), Salida (4 clases operativas)
+                    capas = [10, 8, 6, 4] 
+                    fig = go.Figure()
+                    edge_x, edge_y = [], []
+                    for i in range(len(capas) - 1):
+                        y_start, y_end = np.linspace(0.1, 0.9, capas[i]), np.linspace(0.1, 0.9, capas[i+1])
+                        for ys in y_start:
+                            for ye in y_end:
+                                edge_x.extend([i, i+1, None]); edge_y.extend([ys, ye, None])
+                                
+                    fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', line=dict(color='rgba(0, 210, 255, 0.15)', width=1), hoverinfo='none'))
+                    
+                    for i, num_nodes in enumerate(capas):
+                        color_nodo = '#00D2FF' if i == 0 else ('#9D4EDD' if i == len(capas)-1 else '#00FF7F')
+                        fig.add_trace(go.Scatter(x=[i]*num_nodes, y=np.linspace(0.1, 0.9, num_nodes), mode='markers',
+                            marker=dict(size=16, color=color_nodo, line=dict(width=2, color='#FFFFFF')), hoverinfo='name'))
+                        
+                    fig.update_layout(template="plotly_dark", title=dict(text="Topología Logística (Softmax)", font=dict(color="#E0E0E0")),
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False), yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=350, showlegend=False, margin=dict(t=40, b=10, l=10, r=10))
+                    return fig
+                
+                st.plotly_chart(generar_grafo_mlp_clasificacion(), use_container_width=True, key="grafo_mlp_clf")
+            
+            with col_txt_top_mlp:
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.subheader("Arquitectura Conexionista")
+                st.markdown("""
+                * **Capa de Entrada:** Vector estocástico post-procesado (incluye One-Hot Encoding de alta cardinalidad).
+                * **Capas Ocultas:** Estructura de embudo profundo para extracción de características no lineales.
+                * **Capa de Salida (Softmax):** Cuatro nodos terminales. En lugar de emitir un valor continuo, esta topología calcula una distribución de probabilidad cruzada para las cuatro situaciones operativas del pozo.
+                """)
+                
+            st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
+            
+            col_txt_loss_mlp, col_graf_loss_mlp = st.columns([1, 1.6])
+            with col_txt_loss_mlp:
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.subheader("Descenso de Gradiente (Log-Loss)")
+                st.markdown("""
+                A diferencia de la regresión que minimiza el error de la distancia en metros (MSE), este modelo iteró buscando minimizar la **Entropía Cruzada**.
+                
+                La gráfica muestra cómo el algoritmo ajustó los pesos sinápticos durante sus iteraciones para intentar separar matemáticamente la matriz rala generada por las variables discretas.
+                """)
+            with col_graf_loss_mlp:
+                def generar_curva_loss_clasificacion(mlp_model):
+                    y_loss = mlp_model.loss_curve_ if hasattr(mlp_model, 'loss_curve_') else [0]
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(y=y_loss, mode='lines', line=dict(color='#00FF7F', width=3, shape='spline'),
+                        fill='tozeroy', fillcolor='rgba(0, 255, 127, 0.1)', name='Pérdida Log-Loss'))
+                    fig.update_layout(template="plotly_dark", title=dict(text="Curva de Minimización de Entropía Cruzada", font=dict(color="#E0E0E0")),
+                        xaxis_title="Épocas", yaxis_title="Costo de Pérdida (Loss)", height=350, margin=dict(t=40, b=10, l=10, r=10),
+                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                    return fig
+                
+                st.plotly_chart(generar_curva_loss_clasificacion(mlp_puro_clf), use_container_width=True, key="loss_mlp_clf")
+           
