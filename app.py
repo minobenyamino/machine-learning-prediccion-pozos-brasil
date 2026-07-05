@@ -399,9 +399,9 @@ elif st.session_state.pagina_actual == 'Predicción':
                 st.markdown("<br><br>", unsafe_allow_html=True)
                 st.subheader("1. Topología del Perceptrón Multicapa (MLP)")
                 st.markdown("""
-                * **Capa de Entrada (Input Layer):** Recepción de un tensor de 10 dimensiones, integrando coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
-                * **Capas Profundas (Hidden Layers):** Tres niveles densamente conectados (256, 128 y 64 neuronas) con activación ReLU para modelar la geofísica no lineal del subsuelo.
-                * **Capa de Salida (Target Scaling):** Estrategia de compresión/descompresión estocástica para emitir el cálculo final en metros sin sufrir el colapso de gradientes.
+                * **Capa de Entrada:** Recepción de un tensor de 10 dimensiones, integrando coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
+                * **Capas Profundas:** Tres niveles densamente conectados (256, 128 y 64 neuronas) con activación ReLU para modelar la geofísica no lineal del subsuelo.
+                * **Capa de Salida:** Estrategia de compresión/descompresión estocástica para emitir el cálculo final en metros sin sufrir el colapso de gradientes.
                 """)
                 
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
@@ -449,7 +449,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                 st.subheader("3. Correlación y Densidad (Mapa de Contornos)")
                 st.markdown("""
                 * **Línea de Perfección ($Y=X$):** La línea punteada celeste representa el escenario predictivo perfecto. Los anillos de densidad fuertemente alineados a esta recta validan el altísimo poder de generalización del modelo ($R^2=0.82$).
-                * **Anillos Topográficos:** En lugar de pixeles duros, la gráfica dibuja curvas matemáticas de nivel cerradas. Los colores más claros indican el punto más alto de densidad de datos.
+                * **Anillos Topográficos:** En lugar de pixeles, la gráfica dibuja curvas matemáticas de nivel cerradas. Los colores más oscuros indican el punto más alto de densidad de datos.
                 * **Distribuciones Marginales:** Los histogramas laterales representan el volumen de registros históricos y se alinean con los núcleos de las inferencias.
                 """)
 
