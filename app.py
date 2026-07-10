@@ -342,7 +342,7 @@ if st.session_state.pagina_actual == 'Inicio':
 
     # CONTEXTUALIZACIÓN DEL DATASET (Footer)
     st.markdown("<br><hr style='border: 1px solid #2A2E39;'>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #8C92A4; font-size: 0.9rem;'><b>Material de Estudio:</b> Las arquitecturas matemáticas de este proyecto fueron entrenadas utilizando los registros públicos oficiales de kagle de la <b>Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)</b> de la República Federativa de Brasil.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #8C92A4; font-size: 0.9rem;'><b>Material de Estudio:</b> Las arquitecturas matemáticas de este proyecto fueron entrenadas utilizando los registros públicos de **Kaggle** publicados por la <b>Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)</b> de la República Federativa de Brasil.</p>", unsafe_allow_html=True)
 
 # VISTA 2: MÓDULO DE PREDICCIÓN (MLP & GBM)
 elif st.session_state.pagina_actual == 'Predicción':
