@@ -742,10 +742,6 @@ elif st.session_state.pagina_actual == 'Clasificación':
                 
                 st.plotly_chart(fig_cm, use_container_width=True, key="matriz_gbm")
                 
-            with col_der:
-                st.subheader("3. Curva Precisión-Exhaustividad")
-                st.markdown("**Evaluación Dinámica (PR Curve):** Analiza el algoritmo frente al severo desbalance poblacional. Las trayectorias que convergen hacia la esquina superior derecha confirman alta separabilidad matemática.", unsafe_allow_html=True)
-                st.plotly_chart(generar_curva_precision_recall(pipeline_clf_gbm, df_prueba, clases_nombres), use_container_width=True, key="curva_gbm")
 
     # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA EL MLP ---
     with tab_aud_mlp:
