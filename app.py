@@ -350,7 +350,7 @@ elif st.session_state.pagina_actual == 'Predicción':
     st.markdown("Inferencia de Profundidad de Sondador asistida por Redes Neuronales Artificiales y Gradient Boosting.")
     
     # Se expanden las pestañas a 3
-    tab_inf, tab_aud, tab_aud_gbm = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Arquitectura (MLP)", "📊 Auditoría y Evaluación (GBM)"])
+    tab_inf, tab_aud, tab_aud_gbm = st.tabs(["🔮 Panel de Predicción", "📊 Auditoría y Arquitectura (MLP)", "📊 Auditoría y Evaluación (GBM)"])
     
     with tab_inf:
         # --- INYECCIÓN 1: SELECTOR DE MODELO ---
@@ -534,7 +534,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
     st.markdown("Dictamen categórico estocástico comparando ensamblajes ortogonales frente a topologías neuronales.")
     
     # Se expanden las pestañas a 3
-    tab_inf, tab_aud_gbm, tab_aud_mlp = st.tabs(["🔮 Panel de Inferencia", "📊 Auditoría y Evaluación (GBM)", "📊 Auditoría y Evaluación (MLP)"])
+    tab_inf, tab_aud_gbm, tab_aud_mlp = st.tabs(["🔮 Panel de Predicción", "📊 Auditoría y Evaluación (GBM)", "📊 Auditoría y Evaluación (MLP)"])
     
     # --- PESTAÑA DE INFERENCIA ---
     with tab_inf:
