@@ -527,56 +527,6 @@ elif st.session_state.pagina_actual == 'Predicción':
                 fig_imp_reg.update_layout(template="plotly_dark", coloraxis_showscale=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=380, margin=dict(t=20, b=20, l=10, r=10))
                 st.plotly_chart(fig_imp_reg, use_container_width=True, key="imp_gbm_reg")
 
-            with col_der_reg:
-                st.subheader("2. Análisis de Residuos (Homocedasticidad)")
-                st.markdown("Verifica si los errores del modelo $e = Y_{real} - Y_{pred}$ son aleatorios. Si los puntos forman embudos, la varianza es inestable (Heterocedasticidad).")
-                
-                # Ahora y_predicho_gbm y y_real sí existen en memoria
-                residuos_gbm = y_real - y_predicho_gbm
-                
-                fig_res = px.scatter(
-                    x=y_predicho_gbm, y=residuos_gbm, 
-                    labels={'x': 'Profundidad Inferida (m)', 'y': 'Residuo (Error en m)'}, 
-                    opacity=0.6, color_discrete_sequence=['#00FF7F']
-                )
-                
-                # Línea central de error cero (perfección predictiva)
-                fig_res.add_hline(y=0, line_dash="dot", line_color="#FF4B4B", line_width=2)
-                
-                # =================================================================
-                # NUEVO: CÁLCULO MATEMÁTICO DEL CONO DE HETEROCEDASTICIDAD
-                # =================================================================
-                # 1. Ajustamos una recta (grado 1) sobre el valor absoluto del error
-                z = np.polyfit(y_predicho_gbm, np.abs(residuos_gbm), 1)
-                polinomio = np.poly1d(z)
-                
-                # 2. Generamos el vector X para la longitud del gráfico
-                x_cono = np.linspace(min(y_predicho_gbm), max(y_predicho_gbm), 100)
-                
-                # 3. Calculamos Y. Multiplicamos por 2.5 para abarcar la dispersión 
-                # simulando una envolvente de confianza (aprox 95% de los datos).
-                y_cono_sup = polinomio(x_cono) * 2.5 
-                y_cono_inf = -y_cono_sup
-                
-                # 4. Inyectamos la envolvente superior al gráfico (línea punteada celeste)
-                fig_res.add_trace(go.Scatter(
-                    x=x_cono, y=y_cono_sup, mode='lines', 
-                    line=dict(color='#00D2FF', width=2, dash='dash'), 
-                    name='Límite de Varianza', hoverinfo='skip'
-                ))
-                # 5. Inyectamos la envolvente inferior
-                fig_res.add_trace(go.Scatter(
-                    x=x_cono, y=y_cono_inf, mode='lines', 
-                    line=dict(color='#00D2FF', width=2, dash='dash'), 
-                    showlegend=False, hoverinfo='skip'
-                ))
-                # =================================================================
-                
-                fig_res.update_layout(
-                    template="plotly_dark", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', 
-                    height=380, margin=dict(t=20, b=20, l=10, r=10), showlegend=False
-                )
-                st.plotly_chart(fig_res, use_container_width=True, key="residuos_gbm_reg")
                 
 # VISTA 3: MÓDULO DE CLASIFICACIÓN (GBM & MLP)
 elif st.session_state.pagina_actual == 'Clasificación':
