@@ -695,8 +695,8 @@ elif st.session_state.pagina_actual == 'Clasificación':
 
     # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA EL MLP ---
     with tab_aud_mlp:
-        st.markdown("### Diagnóstico Estructural del Modelo (MLP)")
-        st.markdown("Evaluación multivariante y de interpretabilidad analítica ('Caja Blanca') para la Red Neuronal.")
+        st.markdown("### Estructura del Modelo (MLP)")
+        st.markdown("Un modelo MLP se basa.")
         
         with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
             clases_nombres = metricas_clf_gbm['clases']
@@ -735,7 +735,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
             
             with col_txt_top_mlp:
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.subheader("Arquitectura Conexionista")
+                st.subheader("Arquitectura de las Capas de la Red Neuronal")
                 st.markdown("""
                 * **Capa de Entrada:** Vector estocástico post-procesado (incluye One-Hot Encoding de alta cardinalidad).
                 * **Capas Ocultas:** Estructura de embudo profundo para extracción de características no lineales.
