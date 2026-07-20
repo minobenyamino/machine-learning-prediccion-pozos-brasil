@@ -314,8 +314,8 @@ if st.session_state.pagina_actual != 'Inicio':
 
 # VISTA 1: INICIO (PORTADA)
 if st.session_state.pagina_actual == 'Inicio':
-    st.markdown("<div class='portada-title'>Modelos de Machine Learning asistidos por IA</div>", unsafe_allow_html=True)
-    st.markdown("<div class='portada-subtitle'>Análisis Estocástico Multivariante del Subsuelo Brasileño</div>", unsafe_allow_html=True)
+    st.markdown("<div class='portada-title'>Modelos de Machine Learning Aplicados al Análisis de Pozos</div>", unsafe_allow_html=True)
+    st.markdown("<div class='portada-subtitle'>Análisis predictivo y estadístico del subsuelo basado en registros históricos de Brasil.</div>", unsafe_allow_html=True)
     st.markdown("<div class='portada-academic'>Universidad Central del Ecuador (UCE) | FIGEMPA - Ingeniería en Petróleos</div>", unsafe_allow_html=True)
     st.markdown("<br><br>", unsafe_allow_html=True)
     
