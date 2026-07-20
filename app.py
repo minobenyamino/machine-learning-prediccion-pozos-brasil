@@ -354,13 +354,13 @@ elif st.session_state.pagina_actual == 'Predicción':
     
     with tab_inf:
         # --- INYECCIÓN 1: SELECTOR DE MODELO ---
-        st.markdown("### Configuración del Motor Matemático")
+        st.markdown("### Configuración del Modelo de Predicción")
         motor_seleccionado = st.radio("Seleccione el algoritmo para ejecutar el cálculo:", 
                                       ["Perceptrón Multicapa (MLP)", "Gradient Boosting de Histograma (GBM)"], 
                                       horizontal=True)
         st.markdown("<br>", unsafe_allow_html=True)
         
-        if st.button("🚀 INICIAR PROPAGACIÓN Y CÁLCULO", type="primary", use_container_width=True):
+        if st.button("🚀 INICIAR CÁLCULO", type="primary", use_container_width=True):
             
             # --- COMPUERTA DE VALIDACIÓN LÓGICA (EDGE CASES) - INTACATA ---
             if entorno_operativo == "mar" and lamina_agua <= 0:
@@ -431,9 +431,9 @@ elif st.session_state.pagina_actual == 'Predicción':
                 st.markdown("<br><br>", unsafe_allow_html=True)
                 st.subheader("1. Topología del Perceptrón Multicapa (MLP)")
                 st.markdown("""
-                * **Capa de Entrada:** Recepción de un tensor de 10 dimensiones, integrando coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
-                * **Capas Profundas:** Tres niveles densamente conectados (256, 128 y 64 neuronas) con activación ReLU para modelar la geofísica no lineal del subsuelo.
-                * **Capa de Salida:** Estrategia de compresión/descompresión estocástica para emitir el cálculo final en metros sin sufrir el colapso de gradientes.
+                * **Capa de Entrada:** Recepción de un tensor de 10 dimensiones,10 variables que integran coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
+                * **Capas Profundas:** Tres niveles densamente conectados (256, 128 y 64 neuronas) trabajan en cadena para analizar las complejas características del subsuelo.
+                * **Capa de Salida:** Traduce todo el análisis matemático en una respuesta clara: la profundidad estimada del pozo medida con precisión en metros.
                 """)
                 
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
@@ -539,7 +539,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
     # --- PESTAÑA DE INFERENCIA ---
     with tab_inf:
         # --- INYECCIÓN 1: SELECTOR DE MODELO DE CLASIFICACIÓN ---
-        st.markdown("### Configuración del Motor Matemático")
+        st.markdown("### Configuración del Modelo de Predicción")
         motor_seleccionado_clf = st.radio("Seleccione el algoritmo para la clasificación operativa:", 
                                           ["Gradient Boosting de Histograma (GBM)", "Perceptrón Multicapa (MLP)"], 
                                           horizontal=True)
