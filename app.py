@@ -411,7 +411,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                         st.info(f"📍 **Fin de Perforación Estimado:**\n\nLas rocas objetivo se interceptarán en un estrato comprendido entre **{limite_inferior:,.1f} m** y **{limite_superior:,.1f} m**.")
                         
                         # --- INYECCIÓN 3: MENSAJE CONTRAFACTUAL ---
-                        st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de **{prof_sombra:,.1f} m** (Error MAE: ± {mae_sombra:.1f} m).")
+                        st.warning(f"🔄 Comparativa del Motor Alternativo:\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de **{prof_sombra:,.1f} m** (Error MAE: ± {mae_sombra:.1f} m).")
                         
                     with col_i:
                         st.plotly_chart(generar_curva_probabilidad(profundidad_calculada, mae_activo), use_container_width=True)
