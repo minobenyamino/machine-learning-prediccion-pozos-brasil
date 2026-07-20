@@ -455,27 +455,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                 
             # --- BLOQUE 3: MAPA DE CALOR ---
             col_graf3, col_txt3 = st.columns([1.6, 1])
-            with col_graf3:
-                X_prueba = df_prueba[['LATITUDE_BASE_DD', 'LONGITUDE_BASE_DD', 'LAMINA_D_AGUA_M', 'COTA_ALTIMETRICA_M',
-                                      'BACIA', 'TERRA_MAR', 'TIPO', 'CATEGORIA', 'CAMPO', 'SITUACAO']]
-                y_real = df_prueba['PROFUNDIDADE_SONDADOR_M']
-                X_prueba_estandarizado = preprocesador_reg.transform(X_prueba)
-                y_predicho = modelo_reg_mlp.predict(X_prueba_estandarizado)
-                
-                fig_heat = px.density_contour(
-                    x=y_real, y=y_predicho, 
-                    labels={'x': 'Profundidad Real (m)', 'y': 'Inferencia (m)'}, 
-                    marginal_x="histogram", marginal_y="histogram"
-                )
-                fig_heat.update_traces(contours_coloring="fill", colorscale="Purples", selector=dict(type='histogram2dcontour'))
-                fig_heat.add_shape(type='line', x0=0, y0=0, x1=8000, y1=8000, line=dict(color='#00D2FF', dash='dot', width=2))
-                fig_heat.update_layout(
-                    template="plotly_dark", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-                    height=450, margin=dict(t=50, b=50, l=50, r=50), 
-                    title=dict(text="Concentración de Aciertos del Modelo", font=dict(color="#E0E0E0"))
-                )
-                st.plotly_chart(fig_heat, use_container_width=True)
-                
+            
           
 
     # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA GBM ---
