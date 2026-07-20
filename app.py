@@ -620,7 +620,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
             
             with col_izq:
                 st.subheader("2. Matriz de Confusión Agrupada")
-                st.markdown(f"**Exactitud Global:** {metricas_clf_gbm['exactitud']:.2%} | **Precisión:** {metricas_clf_gbm['precision']:.2%} | **Exhaustividad (Recall):** {metricas_clf_gbm['exhaustividad']:.2%}<br>Muestra empíricamente el volumen de aciertos y errores. Matriz condensada en 4 Macro-Categorías para su correcta lectura óptica.", unsafe_allow_html=True)
+                st.markdown(f"**Acierto General del Modelo:** {metricas_clf_gbm['exactitud']:.2%} | **<br>Este gráfico compara el estado real de los pozos frente a las predicciones que hizo la Inteligencia Artificial. Los cuadros de color oscuro en diagonal muestran los aciertos del modelo. Los cuadros claros muestran los casos en los que el sistema se confundió de categoría. Matriz condensada en 4 Macro-Categorías para su correcta lectura óptica.", unsafe_allow_html=True)
                 
                 def agrupar_situacion(clase_texto):
                     c_low = str(clase_texto).lower()
