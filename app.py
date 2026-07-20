@@ -476,20 +476,13 @@ elif st.session_state.pagina_actual == 'Predicción':
                 )
                 st.plotly_chart(fig_heat, use_container_width=True)
                 
-            with col_txt3:
-                st.markdown("<br><br>", unsafe_allow_html=True)
-                st.subheader("3. ¿Qué tan precisas son nuestras estimaciones?")
-                st.markdown("""
-                * **Línea de Perfección ($Y=X$):** La línea punteada celeste representa el escenario predictivo perfecto. Los anillos de densidad fuertemente alineados a esta recta validan el altísimo poder de generalización del modelo ($R^2=0.82$).
-                * **Anillos Topográficos:** En lugar de pixeles, la gráfica dibuja curvas matemáticas de nivel cerradas. Los colores más oscuros indican el punto más alto de densidad de datos.
-                * **Distribuciones Marginales:** Los histogramas laterales representan el volumen de registros históricos y se alinean con los núcleos de las inferencias.
-                """)
+          
 
     # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA GBM ---
     with tab_aud_gbm:
         # He actualizado el título para reflejar que ya no hay mapa de densidad
-        st.markdown("### Arquitectura de Árboles y Análisis de Residuos (GBM)")
-        st.markdown("Evaluación estocástica del modelo particional alternativo para regresión continua.")
+        st.markdown("### Análisis del Segundo Motor (Modelo de Árboles)")
+        st.markdown("Evaluamos qué datos toma en cuenta nuestro modelo alternativo para calcular la profundidad.")
         
         with st.spinner("Computando ensamblaje de árboles y análisis de residuos..."):
             
@@ -509,7 +502,7 @@ elif st.session_state.pagina_actual == 'Predicción':
             col_izq_reg, col_der_reg = st.columns(2, gap="large")
             
             with col_izq_reg:
-                st.subheader("1. Importancia Predictiva (GBM)")
+                st.subheader("1. ¿Qué información es la más importante para la IA?")
                 st.markdown("Permutación estocástica para revelar qué variables geológicas dominan la partición de los árboles de decisión en la inferencia de profundidad.")
                 
                 # Ensamblamos temporalmente el pipeline completo
