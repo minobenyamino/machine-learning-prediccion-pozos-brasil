@@ -332,8 +332,8 @@ if st.session_state.pagina_actual == 'Inicio':
             
     with col2:
         # Reemplazar el nombre del .svg como corresponda
-        st.image("portada_clasificacion_petroleo_brasil_v2.svg", use_container_width=True, caption="Fronteras de Decisión Discretas")
-        st.markdown("<h3 style='text-align: center; color: #9D4EDD;'>2. Categorías Operativas</h3>", unsafe_allow_html=True)
+        st.image("portada_clasificacion_petroleo_brasil_v2.svg", use_container_width=True, caption="Categorías Operativas")
+        st.markdown("<h3 style='text-align: center; color: #9D4EDD;'>2.Clasificación Operacional</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: GBM (Gradient Boosting Machine)
         st.markdown("<p style='text-align: center;'>Diagnóstico de la situación del pozo mediante algoritmos avanzados de árboles de decisión (GBM).</p>", unsafe_allow_html=True)
         if st.button("INGRESAR AL MÓDULO DE CLASIFICACIÓN", on_click=cambiar_pagina, args=('Clasificación',), use_container_width=True):
