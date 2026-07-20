@@ -738,14 +738,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
             
             col_txt_loss_mlp, col_graf_loss_mlp = st.columns([1, 1.6])
-            with col_txt_loss_mlp:
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.subheader("Descenso de Gradiente (Log-Loss)")
-                st.markdown("""
-                A diferencia de la regresión que minimiza el error de la distancia en metros (MSE), este modelo iteró buscando minimizar la **Entropía Cruzada**.
-                
-                La gráfica muestra cómo el algoritmo ajustó los pesos sinápticos durante sus iteraciones para intentar separar matemáticamente la matriz rala generada por las variables discretas.
-                """)
+           
             with col_graf_loss_mlp:
                 def generar_curva_loss_clasificacion(mlp_model):
                     y_loss = mlp_model.loss_curve_ if hasattr(mlp_model, 'loss_curve_') else [0]
