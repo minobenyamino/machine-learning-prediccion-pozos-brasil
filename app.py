@@ -275,9 +275,9 @@ def generar_grafico_importancia(_pipeline, df_test, clases_nombres):
     
     fig = px.bar(df_imp, x='Importancia', y='Variable', orientation='h', color='Importancia', color_continuous_scale='Purples')
     fig.update_layout(
-        template="plotly_dark", title=dict(text="Impacto Predictivo (Permutación)", font=dict(color="#E0E0E0")),
+        template="plotly_dark", title=dict(text="Impacto Predictivo", font=dict(color="#E0E0E0")),
         plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=450, coloraxis_showscale=False,
-        xaxis_title="Caída de Exactitud al permutar", yaxis_title="Variable"
+        xaxis_title="Pérdida de Precisión del Modelo", yaxis_title="Variable"
     )
     return fig
 
