@@ -578,7 +578,6 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     # ==========================================
                     # FASE 3: RENDERIZADO DE RESULTADOS
                     # ==========================================
-                    st.success(f"🔗 **Pipeline Secuencial Activo:** Se estimó el lecho de roca objetivo en **{profundidad_calculada:,.1f} metros**. Este vector tridimensional fue transferido al clasificador para computar la viabilidad del pozo.")
                     
                     st.markdown(f"""
                         <div class="metric-card" style="border-left-color: #9D4EDD; text-align: center;">
@@ -588,7 +587,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     """, unsafe_allow_html=True)
                     
                     # --- INYECCIÓN 3: MENSAJE CONTRAFACTUAL CLASIFICACIÓN ---
-                    st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de situación **{str(nombre_clase_sombra).upper()}** (Exactitud histórica del motor: {exactitud_sombra:.2%}).")
+                    st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de situación **{str(nombre_clase_sombra).upper()}** (Exactitud del motor: {exactitud_sombra:.2%}).")
 
                     st.subheader("Distribución de Probabilidad")
                     df_probs = pd.DataFrame({'Situación': nombres_clases, 'Probabilidad (%)': probs_activas}).sort_values(by='Probabilidad (%)')
