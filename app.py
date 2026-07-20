@@ -429,9 +429,9 @@ elif st.session_state.pagina_actual == 'Predicción':
                 st.plotly_chart(generar_grafo_red_neuronal(), use_container_width=True)
             with col_txt1:
                 st.markdown("<br><br>", unsafe_allow_html=True)
-                st.subheader("1. Topología del Perceptrón Multicapa (MLP)")
+                st.subheader("1. Arquitectura del Cerebro Artificial (Modelo MLP)")
                 st.markdown("""
-                * **Capa de Entrada:** Recepción de un tensor de 10 dimensiones,10 variables que integran coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
+                * **Capa de Entrada:** Recepción de un tensor de 10 dimensiones, 10 variables que integran coordenadas, topografía (mar/tierra) y metadatos vectorizados (One-Hot Encoding).
                 * **Capas Profundas:** Tres niveles densamente conectados (256, 128 y 64 neuronas) trabajan en cadena para analizar las complejas características del subsuelo.
                 * **Capa de Salida:** Traduce todo el análisis matemático en una respuesta clara: la profundidad estimada del pozo medida con precisión en metros.
                 """)
@@ -442,7 +442,7 @@ elif st.session_state.pagina_actual == 'Predicción':
             col_txt2, col_graf2 = st.columns([1, 1.6])
             with col_txt2:
                 st.markdown("<br><br>", unsafe_allow_html=True)
-                st.subheader("2. Optimización Interna (Curva de Aprendizaje)")
+                st.subheader("2. Curva de Aprendizaje")
                 st.markdown("""
                 * **Pérdida de Entrenamiento (Línea Verde):** Ilustra el descenso del error matemático a medida que el algoritmo actualiza los pesos de sus neuronas durante las iteraciones (épocas).
                 * **Score de Validación (Línea Roja):** Utilizando el eje secundario, demuestra la evolución del Coeficiente de Determinación ($R^2$) frente a datos no vistos.
@@ -472,13 +472,13 @@ elif st.session_state.pagina_actual == 'Predicción':
                 fig_heat.update_layout(
                     template="plotly_dark", plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
                     height=450, margin=dict(t=50, b=50, l=50, r=50), 
-                    title=dict(text="Contornos de Densidad Topográfica", font=dict(color="#E0E0E0"))
+                    title=dict(text="Concentración de Aciertos del Modelo", font=dict(color="#E0E0E0"))
                 )
                 st.plotly_chart(fig_heat, use_container_width=True)
                 
             with col_txt3:
                 st.markdown("<br><br>", unsafe_allow_html=True)
-                st.subheader("3. Correlación y Densidad (Mapa de Contornos)")
+                st.subheader("3. ¿Qué tan precisas son nuestras estimaciones?)")
                 st.markdown("""
                 * **Línea de Perfección ($Y=X$):** La línea punteada celeste representa el escenario predictivo perfecto. Los anillos de densidad fuertemente alineados a esta recta validan el altísimo poder de generalización del modelo ($R^2=0.82$).
                 * **Anillos Topográficos:** En lugar de pixeles, la gráfica dibuja curvas matemáticas de nivel cerradas. Los colores más oscuros indican el punto más alto de densidad de datos.
