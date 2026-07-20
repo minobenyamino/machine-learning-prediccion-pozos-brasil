@@ -609,9 +609,9 @@ elif st.session_state.pagina_actual == 'Clasificación':
             clases_nombres = metricas_clf_gbm['clases']
             
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-            st.subheader("1. Importancia Predictiva de Variables (Permutation Importance)")
+            st.subheader("1. Importancia Predictiva de las Variables en el Modelo")
             st.markdown("""
-            Este análisis cuantifica qué variables impulsaron las decisiones del modelo matemático. Al introducir 'ruido estocástico' (permutando aleatoriamente los datos de una columna), evaluamos la caída de la exactitud. Las barras más largas representan las variables más críticas para el éxito de la inferencia.
+            Este análisis identifica qué información influyó más en las decisiones del modelo matemático. Las barras más largas representan los datos más críticos y determinantes para la precisión del sistema.
             """)
             st.plotly_chart(generar_grafico_importancia(pipeline_clf_gbm, df_prueba, clases_nombres), use_container_width=True, key="importancia_gmb")
             
