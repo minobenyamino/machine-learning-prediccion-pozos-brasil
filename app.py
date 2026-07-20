@@ -418,7 +418,7 @@ elif st.session_state.pagina_actual == 'Predicción':
 
     # --- PESTAÑA ORIGINAL INTACTA (Solo se actualizó modelo_reg a modelo_reg_mlp) ---
     with tab_aud:
-        st.markdown("### Estructura Topológica y Diagnóstico Visual")
+        st.markdown("### Arquitectura del Modelo y Diagnóstico de Rendimiento")
         st.markdown("Visualización de las capas internas de la Red Neuronal (MLP) y análisis gráfico de sus predicciones.")
         
         with st.spinner("Compilando gráficas y extrayendo tensores..."):
