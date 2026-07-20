@@ -148,7 +148,7 @@ def generar_curva_probabilidad(prediccion, mae):
                   annotation_text=f"Objetivo: {prediccion:,.0f}m", annotation_position="top right",
                   annotation_font=dict(color="#FF4B4B", size=13, weight="bold"))
 
-    fig.update_layout(template="plotly_dark", title=dict(text="Análisis de Densidad Estocástica", font=dict(color="#E0E0E0")),
+    fig.update_layout(template="plotly_dark", title=dict(text="Análisis de Densidad", font=dict(color="#E0E0E0")),
                       height=400, margin=dict(l=20, r=20, t=60, b=20), plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
