@@ -483,7 +483,6 @@ elif st.session_state.pagina_actual == 'Predicción':
             
             with col_izq_reg:
                 st.subheader("1. ¿Qué información es la más importante para la IA?")
-                st.markdown("Permutación estocástica para revelar qué variables geológicas dominan la partición de los árboles de decisión en la inferencia de profundidad.")
                 
                 # Ensamblamos temporalmente el pipeline completo
                 from sklearn.pipeline import make_pipeline
