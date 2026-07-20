@@ -483,6 +483,7 @@ elif st.session_state.pagina_actual == 'Predicción':
             
             with col_izq_reg:
                 st.subheader("1. ¿Qué información es la más importante para la IA?")
+                st.markdown("Muestra el impacto relativo de cada variable geográfica y operativa en las predicciones del modelo. El algoritmo evalúa automáticamente qué datos (como las coordenadas o la columna de agua) aportan el mayor peso matemático para determinar con precisión la profundidad final del pozo.")
                 
                 # Ensamblamos temporalmente el pipeline completo
                 from sklearn.pipeline import make_pipeline
