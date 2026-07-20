@@ -478,7 +478,7 @@ elif st.session_state.pagina_actual == 'Predicción':
                 
             with col_txt3:
                 st.markdown("<br><br>", unsafe_allow_html=True)
-                st.subheader("3. ¿Qué tan precisas son nuestras estimaciones?)")
+                st.subheader("3. ¿Qué tan precisas son nuestras estimaciones?")
                 st.markdown("""
                 * **Línea de Perfección ($Y=X$):** La línea punteada celeste representa el escenario predictivo perfecto. Los anillos de densidad fuertemente alineados a esta recta validan el altísimo poder de generalización del modelo ($R^2=0.82$).
                 * **Anillos Topográficos:** En lugar de pixeles, la gráfica dibuja curvas matemáticas de nivel cerradas. Los colores más oscuros indican el punto más alto de densidad de datos.
