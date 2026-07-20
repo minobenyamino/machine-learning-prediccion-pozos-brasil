@@ -347,10 +347,10 @@ if st.session_state.pagina_actual == 'Inicio':
 # VISTA 2: MÓDULO DE PREDICCIÓN (MLP & GBM)
 elif st.session_state.pagina_actual == 'Predicción':
     st.title("🎯 Modelo Predictivo: Regresión Continua")
-    st.markdown("Inferencia de Profundidad de Sondador asistida por Redes Neuronales Artificiales y Gradient Boosting.")
+    st.markdown("Estimación de la profundidad de perforación basada en modelos de Redes Neuronales y Gradient Boosting.")
     
     # Se expanden las pestañas a 3
-    tab_inf, tab_aud, tab_aud_gbm = st.tabs(["🔮 Panel de Predicción", "📊 Auditoría y Arquitectura (MLP)", "📊 Auditoría y Evaluación (GBM)"])
+    tab_inf, tab_aud, tab_aud_gbm = st.tabs(["🔮 Panel de Predicción", "🧠 Análisis del Motor Principal (MLP)", "📊 Análisis del Motor Alternativo (GBM)"])
     
     with tab_inf:
         # --- INYECCIÓN 1: SELECTOR DE MODELO ---
@@ -504,10 +504,10 @@ elif st.session_state.pagina_actual == 'Predicción':
 # VISTA 3: MÓDULO DE CLASIFICACIÓN (GBM & MLP)
 elif st.session_state.pagina_actual == 'Clasificación':
     st.title("🗂️ Módulo Operacional: Clasificación")
-    st.markdown("Dictamen categórico estocástico comparando ensamblajes ortogonales frente a topologías neuronales.")
+    st.markdown("Evaluación del estado actual de los pozos contrastando el rendimiento del modelo de árboles de decisión (GBM) frente a la red neuronal (MLP).")
     
     # Se expanden las pestañas a 3
-    tab_inf, tab_aud_gbm, tab_aud_mlp = st.tabs(["🔮 Panel de Predicción", "📊 Auditoría y Evaluación (GBM)", "📊 Auditoría y Evaluación (MLP)"])
+    tab_inf, tab_aud_gbm, tab_aud_mlp = st.tabs(["🔮 Panel de Predicción", "🧠 Análisis del Motor Principal(GBM)", "📊 Análisis del Motor Alternativo (MLP)"])
     
     # --- PESTAÑA DE INFERENCIA ---
     with tab_inf:
@@ -669,7 +669,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
     # --- INYECCIÓN 4: PESTAÑA EXCLUSIVA PARA EL MLP ---
     with tab_aud_mlp:
         st.markdown("### Estructura del Modelo (MLP)")
-        st.markdown("Un modelo MLP se basa.")
+        st.markdown("Un modelo MLP se basa en una red de neuronas artificiales interconectadas. Su función es procesar los datos de los pozos en múltiples niveles para calcular cuál es su situación operativa más probable.")
         
         with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
             clases_nombres = metricas_clf_gbm['clases']
@@ -710,9 +710,9 @@ elif st.session_state.pagina_actual == 'Clasificación':
                 st.markdown("<br>", unsafe_allow_html=True)
                 st.subheader("Arquitectura de las Capas de la Red Neuronal")
                 st.markdown("""
-                * **Capa de Entrada:** Vector estocástico post-procesado (incluye One-Hot Encoding de alta cardinalidad).
-                * **Capas Ocultas:** Estructura de embudo profundo para extracción de características no lineales.
-                * **Capa de Salida (Softmax):** Cuatro nodos terminales. En lugar de emitir un valor continuo, esta topología calcula una distribución de probabilidad cruzada para las cuatro situaciones operativas del pozo.
+                * **Capa de Entrada:** Captura y transforma el conjunto de variables geográficas y operativas del pozo.
+                * **Capas Ocultas:** Estructura intermedia encargada de extraer las relaciones y patrones geológicos complejos presentes en los datos.
+                * **Capa de Salida: Convierte los resultados del procesamiento en probabilidades porcentuales. Esto permite evaluar con precisión el nivel de certeza del modelo para cada una de las 4 categorías operativas.
                 """)
                 
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
