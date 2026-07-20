@@ -739,16 +739,3 @@ elif st.session_state.pagina_actual == 'Clasificación':
             
             col_txt_loss_mlp, col_graf_loss_mlp = st.columns([1, 1.6])
            
-            with col_graf_loss_mlp:
-                def generar_curva_loss_clasificacion(mlp_model):
-                    y_loss = mlp_model.loss_curve_ if hasattr(mlp_model, 'loss_curve_') else [0]
-                    fig = go.Figure()
-                    fig.add_trace(go.Scatter(y=y_loss, mode='lines', line=dict(color='#00FF7F', width=3, shape='spline'),
-                        fill='tozeroy', fillcolor='rgba(0, 255, 127, 0.1)', name='Pérdida Log-Loss'))
-                    fig.update_layout(template="plotly_dark", title=dict(text="Curva de Minimización de Entropía Cruzada", font=dict(color="#E0E0E0")),
-                        xaxis_title="Épocas", yaxis_title="Costo de Pérdida (Loss)", height=350, margin=dict(t=40, b=10, l=10, r=10),
-                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                    return fig
-                
-                st.plotly_chart(generar_curva_loss_clasificacion(mlp_puro_clf), use_container_width=True, key="loss_mlp_clf")
-           
