@@ -326,7 +326,7 @@ if st.session_state.pagina_actual == 'Inicio':
         st.image("portada_prediccion_petroleo_pro.svg", use_container_width=True, caption="Variables Continuas")
         st.markdown("<h3 style='text-align: center; color: #00D2FF;'>1. Predicción de Profundidad</h3>", unsafe_allow_html=True)
         # Acrónimo resuelto: MLP (Multi-Layer Perceptron)
-        st.markdown("<p style='text-align: center;'>Estimación de la profundidad total del sondador basada en modelos de Redes Neuronales (MLP).</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Visualización de las capas internas de la Red Neuronal (MLP) y análisis gráfico de sus predicciones.</p>", unsafe_allow_html=True)
         if st.button("INGRESAR AL MÓDULO PREDICTIVO", on_click=cambiar_pagina, args=('Predicción',), use_container_width=True):
             pass
             
