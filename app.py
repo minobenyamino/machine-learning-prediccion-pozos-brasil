@@ -588,7 +588,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
                     """, unsafe_allow_html=True)
                     
                     # --- INYECCIÓN 3: MENSAJE CONTRAFACTUAL CLASIFICACIÓN ---
-                    st.warning(f"🔄 **Benchmark Predictivo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de situación **{str(nombre_clase_sombra).upper()}** (Exactitud del motor: {exactitud_sombra:.2%}).")
+                    st.warning(f"🔄 **Comparativa del Motor Alternativo:**\n\nCon el otro modelo ({nombre_sombra}) se hubiera obtenido un dictamen de situación **{str(nombre_clase_sombra).upper()}** (Exactitud del motor: {exactitud_sombra:.2%}).")
 
                     st.subheader("Distribución de Probabilidad")
                     df_probs = pd.DataFrame({'Situación': nombres_clases, 'Probabilidad (%)': probs_activas}).sort_values(by='Probabilidad (%)')
