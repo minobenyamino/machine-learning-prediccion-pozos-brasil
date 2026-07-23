@@ -113,13 +113,10 @@ def generar_datos_rendimiento():
         df[col] = df[col].apply(lambda x: unidecode(str(x)).lower().strip() if pd.notnull(x) else "desconocido")
         
     # --- PARCHE VITAL: SINCRONIZACIÓN DE ETIQUETAS ---
-    # Traduce y agrupa las situaciones de prueba para que el modelo reconozca el texto
     def agrupar_situacion_prueba(s):
         if 'produt' in s or 'jazida' in s: return 'productores / activos'
         if 'abandon' in s or 'arras' in s: return 'abandonados / cerrados'
-        if 'interven' in s or 'avalia' in s or 'pioneiro' in s or 'explora' in s: return 'exploracion / intervencion'
-        if 'injet' in s: return 'inyectores'
-        return 'otras_situaciones'
+        return 'otras_operaciones'
         
     df['SITUACAO'] = df['SITUACAO'].apply(agrupar_situacion_prueba)
     
@@ -306,7 +303,11 @@ if st.session_state.pagina_actual != 'Inicio':
         
         clase_pozo = st.selectbox("Tipo de Operación", ["desarrollo", "exploratorio"])
         categoria_pozo = st.selectbox("Categoría Estratégica", ["desarrollo", "pionero", "extension", "especial", "inyeccion", "otras_categorias"])
-        situacion_pozo = st.selectbox("Situación Esperada", diccionario.get('situaciones', []))
+        situacion_pozo = st.selectbox(
+    "Situación Esperada", 
+    ["productores / activos", "abandonados / cerrados", "otras_operaciones"],
+    format_func=lambda x: x.title() # Esto hace que se vea como "Otras Operaciones" en la interfaz
+)
 
 # ==========================================
 # 5. ENRUTADOR DE PÁGINAS (VISTAS)
@@ -602,7 +603,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
     # --- PESTAÑA ORIGINAL INTACTA (Solo renombrada a GBM) ---
     with tab_aud_gbm:
         st.markdown("### Diagnóstico Estructural del Modelo (GBM)")
-        st.markdown("Evaluación multivariante y de interpretabilidad analítica ('Caja Blanca').")
+        st.markdown("Evaluación general del desempeño y comportamiento del motor principal..")
         
         with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
             clases_nombres = metricas_clf_gbm['clases']
@@ -618,41 +619,28 @@ elif st.session_state.pagina_actual == 'Clasificación':
             col_izq, col_der = st.columns(2, gap="large")
             
             with col_izq:
-                st.subheader("2. Matriz de Confusión Agrupada")
-                st.markdown(f"**Acierto General del Modelo: {metricas_clf_gbm['exactitud']:.2%}** <br>Este gráfico compara el estado real de los pozos frente a las predicciones que hizo la Inteligencia Artificial. Los cuadros de color oscuro en diagonal muestran los aciertos del modelo. Los cuadros claros muestran los casos en los que el sistema se confundió de categoría. Matriz condensada en 4 Macro-Categorías para su correcta lectura óptica.", unsafe_allow_html=True)
+                st.subheader("2. Matriz de Confusión Agrupada en 3 Macrogrupos")
+                st.markdown(f"**Acierto General del Modelo: {metricas_clf_gbm['exactitud']:.2%}** <br>Este gráfico compara el estado real de los pozos frente a las predicciones. La diagonal representa el porcentaje de acierto para cada clase operativa. Modelo optimizado con SMOTETomek para manejar el desbalance de clases.", unsafe_allow_html=True)
                 
-                def agrupar_situacion(clase_texto):
-                    c_low = str(clase_texto).lower()
-                    if 'produt' in c_low or 'product' in c_low or 'injet' in c_low or 'jazida' in c_low: 
-                        return 'Productores / Activos'
-                    elif 'abandon' in c_low or 'arrasamento' in c_low: 
-                        return 'Abandonados / Cerrados'
-                    elif 'pioneiro' in c_low or 'explora' in c_low or 'estrat' in c_low: 
-                        return 'Exploración / Pioneros'
-                    else: 
-                        return 'Otras Situaciones'
-
-                macro_clases = ['Productores / Activos', 'Abandonados / Cerrados', 'Exploración / Pioneros', 'Otras Situaciones']
-                map_indices = {i: agrupar_situacion(c) for i, c in enumerate(clases_nombres)}
+                clases_crudas = metricas_clf_gbm['clases']
+                macro_clases = [str(c).title() for c in clases_crudas]
                 
-                matriz_agrupada = pd.DataFrame(0, index=macro_clases, columns=macro_clases)
-                for i in range(len(clases_nombres)):
-                    for j in range(len(clases_nombres)):
-                        cat_real = map_indices[i]
-                        cat_pred = map_indices[j]
-                        matriz_agrupada.loc[cat_real, cat_pred] += metricas_clf_gbm['matriz_confusion'][i][j]
+                # La matriz ya viene normalizada de 0 a 1 desde el archivo .pkl
+                matriz_optimizada = metricas_clf_gbm['matriz_confusion']
 
                 fig_cm = px.imshow(
-                    matriz_agrupada, 
+                    matriz_optimizada, 
                     x=macro_clases, 
                     y=macro_clases, 
                     color_continuous_scale='Purples', 
                     aspect="equal",
-                    text_auto=True 
+                    text_auto='.1%', # Formato porcentual para los números de las celdas
+                    zmin=0,          # Escala honesta (0%)
+                    zmax=1           # Escala honesta (100%)
                 )
                 
                 fig_cm.update_traces(
-                    hovertemplate="Real: %{y}<br>Predicho: %{x}<br>Frecuencia: %{z}<extra></extra>",
+                    hovertemplate="Real: %{y}<br>Predicho: %{x}<br>Tasa de Acierto: %{z:.1%}<extra></extra>",
                     zsmooth=False, xgap=2, ygap=2
                 )
                 
@@ -682,7 +670,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
                 # Función inline para el esquema topológico de clasificación
                 def generar_grafo_mlp_clasificacion():
                     # Entrada (10), Ocultas (simuladas visualmente), Salida (4 clases operativas)
-                    capas = [10, 8, 6, 4] 
+                    capas = [10, 8, 6, 3] 
                     fig = go.Figure()
                     edge_x, edge_y = [], []
                     for i in range(len(capas) - 1):
