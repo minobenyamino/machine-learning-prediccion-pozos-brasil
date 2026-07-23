@@ -699,7 +699,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
                 st.markdown("""
                 * **Capa de Entrada:** Captura y transforma el conjunto de variables geográficas y operativas del pozo.
                 * **Capas Ocultas:** Estructura intermedia encargada de extraer las relaciones y patrones geológicos complejos presentes en los datos.
-                * **Capa de Salida: Convierte los resultados del procesamiento en probabilidades porcentuales. Esto permite evaluar con precisión el nivel de certeza del modelo para cada una de las 4 categorías operativas.
+                * **Capa de Salida:** Convierte los resultados del procesamiento en probabilidades porcentuales. Esto permite evaluar con precisión el nivel de certeza del modelo para cada una de las 4 categorías operativas.
                 """)
                 
             st.markdown("<hr style='border: 1px solid #2A2E39; margin-top: 10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
