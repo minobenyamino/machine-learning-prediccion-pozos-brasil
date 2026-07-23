@@ -603,7 +603,7 @@ elif st.session_state.pagina_actual == 'Clasificación':
     # --- PESTAÑA ORIGINAL INTACTA (Solo renombrada a GBM) ---
     with tab_aud_gbm:
         st.markdown("### Diagnóstico Estructural del Modelo (GBM)")
-        st.markdown("Evaluación general del desempeño y comportamiento del motor principal..")
+        st.markdown("Evaluación general del desempeño y comportamiento del motor principal.")
         
         with st.spinner("Compilando métricas y ejecutando permutación estocástica..."):
             clases_nombres = metricas_clf_gbm['clases']
